@@ -2,7 +2,7 @@
 ## 功能
 
 - `!backup`：手動備份當前伺服器
-- 定期排程備份（可修改排程時間）（尚未實裝）
+- 定期排程備份（可修改排程時間）**（尚未實裝）**
 - 匯出：
   - 所有文字頻道訊息
   - 頻道分類、頻道、角色
@@ -65,8 +65,8 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 到 Discord Developer Portal > 機器人設定 > Privileged Gateway Intents 中：
 
-• ✅ 開啟 Server Members Intent
-• ✅ 開啟 Message Content Intent
+• ✅ 開啟 Server Members Intent  
+• ✅ 開啟 Message Content Intent  
 
 ## 使用方式
 
@@ -106,10 +106,10 @@ backups/
 ## 後續計畫（也許大概有機會有時間的話會新增）
 （歡迎貢獻）
 
-•壓縮備份資料 .zip
-•將備份同步到 Google Drive / OneDrive
-•加入 Email 通知
-•匯出 Emoji / Webhook 設定
+•壓縮備份資料 .zip  
+•將備份同步到 Google Drive / OneDrive  
+•加入 Email 通知  
+•匯出 Emoji / Webhook 設定  
 
 
 本工具由 AI 協助，配合自架平台訊息遷移需求打造。如需協助擴充功能，歡迎提問！
