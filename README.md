@@ -1,14 +1,115 @@
 # Discord_backup_bot
-## Bot structure
+## 功能
+
+- `!backup`：手動備份當前伺服器
+- 定期排程備份（可修改排程時間）（尚未實裝）
+- 匯出：
+  - 所有文字頻道訊息
+  - 頻道分類、頻道、角色
+  - 所有伺服器成員 ID、暱稱、狀態
+- 支援儲存格式：
+  - `.json`：完整資料結構
+  - `.txt`：純文字輸出
+  - `.html`：簡易視覺化版本
+
+## 專案結構
+
 discord_backup_bot/  
-├── bot.py                  # 主程式，啟動 Bot 並處理指令  
-├── config.json             # 儲存 Token、伺服器 ID、輸出格式等  
-├── backup_manager.py       # 控管備份流程的模組  
+├── bot.py # 主程式，啟動 Bot 並處理指令  
+├── config.json # 儲存 Token、伺服器 ID、輸出格式等  
+├── backup_manager.py # 控管備份流程的模組  
 ├── utils/  
-│   ├── message_exporter.py     # 匯出訊息（JSON/HTML/TXT）  
-│   ├── attachment_downloader.py  # 下載附件  
-│   ├── structure_exporter.py    # 匯出頻道、角色、分類等設定  
-│   └── formatter.py          # 控管輸出格式  
-├── backups/                # 備份資料儲存資料夾  
+│   ├── message_exporter.py # 匯出訊息（JSON/HTML/TXT）  
+│   ├── attachment_downloader.py # 下載附件  
+│   ├── structure_exporter.py # 匯出頻道、角色、分類等設定  
+│   └── formatter.py # 控管輸出格式  
+├── backups/ # 備份資料儲存資料夾  
 │   └── ...  
-└── scheduler.py            # 可獨立執行的排程備份腳本  
+└── scheduler.py # 可獨立執行的排程備份腳本  
+
+## 安裝與執行
+
+### 1. 安裝 Python 套件
+
+建議使用 Python 3.9+。
+
+```bash
+pip install -r requirements.txt
+
+requirements.txt
+
+discord.py
+schedule
+```
+
+### 2. 設定 BOT Token
+
+建立 config.json 並填入你的 Discord bot token：
+
+{
+  "BOT_TOKEN": "你的 token 放這裡"
+}
+
+或在 config.py 中直接讀取該檔案：
+
+```
+import json
+
+with open("config.json", "r") as f:
+    config = json.load(f)
+
+BOT_TOKEN = config["BOT_TOKEN"]
+```
+
+### 3. 啟用 Intent（重要）
+
+到 Discord Developer Portal > 機器人設定 > Privileged Gateway Intents 中：
+
+	•	✅ 開啟 Server Members Intent
+	•	✅ 開啟 Message Content Intent
+
+## 使用方式
+
+### 手動備份
+
+在 Discord 中輸入指令：
+
+```
+!backup
+```
+
+機器人會開始備份當前伺服器，並儲存到 backups/ 資料夾。
+
+### 自動排程備份（尚未實裝）
+
+機器人啟動後會自動依照 scheduler.py 設定的時間執行備份。
+
+目前預設：每天午夜 00:00 自動執行。
+
+你可以修改：
+```
+# scheduler.py
+schedule.every().day.at("00:00").do(backup_job, bot)
+```
+
+備份結果說明
+
+backups/
+└── MyServer_20250424_120000/
+    ├── structure.json    # 頻道分類、文字/語音頻道、角色
+    ├── members.json      # 所有使用者 ID、暱稱、狀態
+    └── channels/
+        ├── general.json
+        ├── general.html
+        └── general.txt
+
+## 後續計畫（也許大概有機會有時間的話會新增）
+（歡迎貢獻）
+
+	•	壓縮備份資料 .zip
+	•	將備份同步到 Google Drive / OneDrive
+	•	加入 Telegram / Email 通知
+	•	匯出 Emoji / Webhook 設定
+
+
+本工具由 AI 協助，配合自架平台訊息遷移需求打造。如需協助擴充功能，歡迎提問！
