@@ -13,7 +13,7 @@
   - `.html`：簡易視覺化版本
 
 ## 專案結構
-
+```
 discord_backup_bot/  
 ├── bot.py # 主程式，啟動 Bot 並處理指令  
 ├── config.json # 儲存 Token、伺服器 ID、輸出格式等  
@@ -26,7 +26,7 @@ discord_backup_bot/
 ├── backups/ # 備份資料儲存資料夾  
 │   └── ...  
 └── scheduler.py # 可獨立執行的排程備份腳本  
-
+```
 ## 安裝與執行
 
 ### 1. 安裝 Python 套件
@@ -93,7 +93,7 @@ schedule.every().day.at("00:00").do(backup_job, bot)
 ```
 
 備份結果說明
-
+```
 backups/  
 └── MyServer_20250424_120000/  
     ├── structure.json    # 頻道分類、文字/語音頻道、角色  
@@ -102,7 +102,7 @@ backups/
         ├── general.json  
         ├── general.html  
         └── general.txt  
-
+```
 ## 後續計畫（也許大概有機會有時間的話會新增）
 （歡迎貢獻）
 
