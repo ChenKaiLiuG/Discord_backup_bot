@@ -65,8 +65,8 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 到 Discord Developer Portal > 機器人設定 > Privileged Gateway Intents 中：
 
-	•	✅ 開啟 Server Members Intent
-	•	✅ 開啟 Message Content Intent
+• ✅ 開啟 Server Members Intent
+• ✅ 開啟 Message Content Intent
 
 ## 使用方式
 
@@ -82,9 +82,9 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 ### 自動排程備份（尚未實裝）
 
-機器人啟動後會自動依照 scheduler.py 設定的時間執行備份。
+機器人啟動後會自動依照 scheduler.py 設定的時間執行備份。  
 
-目前預設：每天午夜 00:00 自動執行。
+目前預設：每天午夜 00:00 自動執行。  
 
 你可以修改：
 ```
@@ -106,10 +106,10 @@ backups/
 ## 後續計畫（也許大概有機會有時間的話會新增）
 （歡迎貢獻）
 
-	•	壓縮備份資料 .zip
-	•	將備份同步到 Google Drive / OneDrive
-	•	加入 Telegram / Email 通知
-	•	匯出 Emoji / Webhook 設定
+•壓縮備份資料 .zip
+•將備份同步到 Google Drive / OneDrive
+•加入 Email 通知
+•匯出 Emoji / Webhook 設定
 
 
 本工具由 AI 協助，配合自架平台訊息遷移需求打造。如需協助擴充功能，歡迎提問！
