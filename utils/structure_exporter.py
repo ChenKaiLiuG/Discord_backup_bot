@@ -50,11 +50,13 @@ def export_structure(guild, backup_path):
     with open(structure_file, "w", encoding="utf-8") as f:
         json.dump(structure, f, ensure_ascii=False, indent=2)
 
-    # 儲存所有成員的 ID 和名稱
+    # 儲存所有成員的 ID、名稱、暱稱與狀態
     members = [{
         "id": member.id,
         "name": member.name,
-        "discriminator": member.discriminator
+        "discriminator": member.discriminator,
+        "nickname": member.nick if member.nick else None,  # 儲存暱稱
+        "status": str(member.status)  # 儲存狀態（如：online, offline, dnd）
     } for member in guild.members]
 
     with open(members_file, "w", encoding="utf-8") as f:
