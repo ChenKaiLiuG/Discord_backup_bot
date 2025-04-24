@@ -94,14 +94,14 @@ schedule.every().day.at("00:00").do(backup_job, bot)
 
 備份結果說明
 
-backups/
-└── MyServer_20250424_120000/
-    ├── structure.json    # 頻道分類、文字/語音頻道、角色
-    ├── members.json      # 所有使用者 ID、暱稱、狀態
-    └── channels/
-        ├── general.json
-        ├── general.html
-        └── general.txt
+backups/  
+└── MyServer_20250424_120000/  
+    ├── structure.json    # 頻道分類、文字/語音頻道、角色  
+    ├── members.json      # 所有使用者 ID、暱稱、狀態  
+    └── channels/  
+        ├── general.json  
+        ├── general.html  
+        └── general.txt  
 
 ## 後續計畫（也許大概有機會有時間的話會新增）
 （歡迎貢獻）
