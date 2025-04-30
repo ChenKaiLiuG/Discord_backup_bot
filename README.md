@@ -35,9 +35,9 @@ discord_backup_bot/
 
 ```bash
 pip install -r requirements.txt
-
+```
 requirements.txt
-
+```
 discord.py
 schedule
 ```
@@ -47,7 +47,8 @@ schedule
 建立 config.json 並填入你的 Discord bot token：
 
 {
-  "BOT_TOKEN": "你的 token 放這裡"
+  "BOT_TOKEN": "你的 token 放這裡",
+  "Guild_id": "複製你的伺服器 id"
 }
 
 或在 config.py 中直接讀取該檔案：
