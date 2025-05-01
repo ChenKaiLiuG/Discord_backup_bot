@@ -4,7 +4,7 @@ import asyncio
 import json
 
 from backup_manager import run_backup
-from scheduler import schedule_backups
+# from scheduler import schedule_backups
 
 # -----------------------------------------------------
 # 載入 Token 與設定
