@@ -44,23 +44,24 @@ schedule
 
 ### 2. 設定 BOT Token
 
-建立 config.json 並填入你的 Discord bot token：
-
+修改 config.json 並填入你的 Discord bot token 和伺服器 id：
+```config.json
 {
   "BOT_TOKEN": "你的 token 放這裡",
   "Guild_id": "複製你的伺服器 id"
 }
-
-或在 config.py 中直接讀取該檔案：
-
 ```
-import json
 
-with open("config.json", "r") as f:
-    config = json.load(f)
+// 或在 config.py 中直接讀取該檔案：
 
-BOT_TOKEN = config["BOT_TOKEN"]
-```
+//```
+//import json
+
+//with open("config.json", "r") as f:
+//    config = json.load(f)
+
+//BOT_TOKEN = config["BOT_TOKEN"]
+//```
 
 ### 3. 啟用 Intent（重要）
 
