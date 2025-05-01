@@ -4,7 +4,7 @@ import asyncio
 import json
 
 from backup_manager import run_backup
-from scheduler import schedule_backups
+# from scheduler import schedule_backups
 
 # -----------------------------------------------------
 # 載入 Token 與設定
@@ -19,6 +19,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 intents.members = True  # 匯出成員資訊需要這個
+intents.message_content = True  
 
 # -----------------------------------------------------
 # 建立 bot 實例

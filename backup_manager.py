@@ -34,32 +34,25 @@ async def export_structure(guild, backup_path):
         "roles": [],
     }
 
-    for category in guild.categories:
-        structure["categories"].append({
-            "id": category.id,
-            "name": category.name
-        })
+    structure["categories"] = [
+        {"id": category.id, "name": category.name} 
+        for category in guild.categories
+    ]
 
-    for channel in guild.text_channels:
-        structure["channels"].append({
-            "id": channel.id,
-            "name": channel.name,
-            "type": "text"
-        })
+    structure["channels"] = [
+        {"id": channel.id, "name": channel.name, "type": "text"}
+        for channel in guild.text_channels
+    ]
 
-    for channel in guild.voice_channels:
-        structure["channels"].append({
-            "id": channel.id,
-            "name": channel.name,
-            "type": "voice"
-        })
+    structure["channels"] += [
+        {"id": channel.id, "name": channel.name, "type": "voice"}
+        for channel in guild.voice_channels
+    ]
 
-    for role in guild.roles:
-        structure["roles"].append({
-            "id": role.id,
-            "name": role.name,
-            "permissions": [str(perm) for perm in role.permissions]
-        })
+    structure["roles"] = [
+        {"id": role.id, "name": role.name, "permissions": [str(perm) for perm in role.permissions]}
+        for role in guild.roles 
+    ]
 
     with open(structure_file, "w", encoding="utf-8") as f:
         json.dump(structure, f, ensure_ascii=False, indent=2)
