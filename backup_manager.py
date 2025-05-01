@@ -1,8 +1,9 @@
 import os
 import json
 import datetime
+import discord
 
-async def run_backup(bot, guild):
+async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
     """主備份流程，包含訊息與結構備份"""
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -21,7 +22,7 @@ async def run_backup(bot, guild):
 # ---------------------------------------------------------------------
 # 結構匯出
 
-async def export_structure(guild, backup_path):
+async def export_structure(guild: discord.guild.Guild, backup_path: str):
     """匯出伺服器結構與成員清單"""
     structure_file = os.path.join(backup_path, "structure.json")
     members_file = os.path.join(backup_path, "members.json")
@@ -71,7 +72,7 @@ async def export_structure(guild, backup_path):
 # ---------------------------------------------------------------------
 # 訊息匯出
 
-async def export_channel_messages(channel, backup_path):
+async def export_channel_messages(channel: discord.channel.TextChannel, backup_path: str):
     """將頻道訊息匯出為 json/html/txt 檔案"""
     print(f"正在備份頻道：{channel.name}")
     messages = []
