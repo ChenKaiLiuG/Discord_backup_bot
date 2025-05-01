@@ -34,9 +34,9 @@ discord_backup_bot/
 建議使用 Python 3.9+。
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
-requirements.txt
+requirement.txt
 ```
 discord.py
 schedule
