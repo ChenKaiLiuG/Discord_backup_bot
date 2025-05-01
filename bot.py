@@ -34,9 +34,9 @@ async def on_ready():
 #    asyncio.create_task(run_schedule())
 
 # -----------------------------------------------------
-# 指令：!backup（手動備份當前伺服器）
+# 指令：!backup_yushiuan9499（手動備份當前伺服器）
 @bot.command()
-async def backup(ctx):
+async def backup_yushiuan9499(ctx):
     await ctx.send("開始備份伺服器資料...")
     await run_backup(bot, ctx.guild)
     await ctx.send("備份完成！")
