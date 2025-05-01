@@ -7,7 +7,9 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
     """主備份流程，包含訊息與結構備份"""
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = os.path.join("backups", f"{guild.name}_{timestamp}")
+    with open("config.json", "r", encoding="utf-8") as f:
+        backup_folder = json.load(f)["backup_folder"]
+    backup_path = os.path.join(backup_folder, f"{guild.name}_{timestamp}")
     os.makedirs(backup_path, exist_ok=True)
 
     # 匯出伺服器結構與使用者清單
@@ -73,6 +75,8 @@ async def export_structure(guild: discord.guild.Guild, backup_path: str):
 # 訊息匯出
 
 async def export_channel_messages(channel: discord.channel.TextChannel, backup_path: str):
+    with open("config.json", "r", encoding="utf-8") as f:
+        output_format = set(json.load(f)["output_format"])
     """將頻道訊息匯出為 json/html/txt 檔案"""
     print(f"正在備份頻道：{channel.name}")
     messages = []
@@ -97,21 +101,24 @@ async def export_channel_messages(channel: discord.channel.TextChannel, backup_p
     os.makedirs(channel_dir, exist_ok=True)
 
     # 儲存為 JSON
-    json_path = os.path.join(channel_dir, f"{channel.name}.json")
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
+    if "json" in output_format:
+        json_path = os.path.join(channel_dir, f"{channel.name}.json")
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(messages, f, ensure_ascii=False, indent=2)
 
     # 儲存為 TXT
-    txt_path = os.path.join(channel_dir, f"{channel.name}.txt")
-    with open(txt_path, "w", encoding="utf-8") as f:
-        for msg in messages:
-            f.write(f"[{msg['timestamp']}] {msg['author']}: {msg['content']}\n")
+    if "txt" in output_format:
+        txt_path = os.path.join(channel_dir, f"{channel.name}.txt")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            for msg in messages:
+                f.write(f"[{msg['timestamp']}] {msg['author']}: {msg['content']}\n")
 
     # 儲存為簡易 HTML
-    html_path = os.path.join(channel_dir, f"{channel.name}.html")
-    with open(html_path, "w", encoding="utf-8") as f:
-        f.write("<html><body>\n")
-        f.write(f"<h1>Channel: {channel.name}</h1>\n")
-        for msg in messages:
-            f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}</p>\n")
-        f.write("</body></html>")
+    if "html" in output_format:
+        html_path = os.path.join(channel_dir, f"{channel.name}.html")
+        with open(html_path, "w", encoding="utf-8") as f:
+            f.write("<html><body>\n")
+            f.write(f"<h1>Channel: {channel.name}</h1>\n")
+            for msg in messages:
+                f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}</p>\n")
+            f.write("</body></html>")
