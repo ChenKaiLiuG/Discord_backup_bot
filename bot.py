@@ -11,7 +11,7 @@ from scheduler import schedule_backups
 with open("config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
-BOT_TOKEN = config["BOT_TOKEN"]
+BOT_TOKEN = config["bot_token"]
 
 # -----------------------------------------------------
 # 啟用 Intents
@@ -31,7 +31,7 @@ async def on_ready():
     print(f"機器人已登入：{bot.user.name} (ID: {bot.user.id})")
     print(f"目前已加入 {len(bot.guilds)} 個伺服器")
     # 啟動備份排程（非同步背景執行）
-    asyncio.create_task(run_schedule())
+#    asyncio.create_task(run_schedule())
 
 # -----------------------------------------------------
 # 指令：!backup（手動備份當前伺服器）
@@ -43,8 +43,8 @@ async def backup(ctx):
 
 # -----------------------------------------------------
 # 啟動排程（放在背景 thread 避免阻塞）
-async def run_schedule():
-    await asyncio.to_thread(schedule_backups, bot)
+#async def run_schedule():
+#    await asyncio.to_thread(schedule_backups, bot)
 
 # -----------------------------------------------------
 # 啟動 bot
