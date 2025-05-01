@@ -47,8 +47,10 @@ schedule
 修改 config.json 並填入你的 Discord bot token 和伺服器 id：
 ```config.json
 {
-  "BOT_TOKEN": "你的 token 放這裡",
-  "Guild_id": "複製你的伺服器 id"
+  "bot_token": "你的 token 放這裡",
+  "guild_id": "複製你的伺服器 id",
+  "output_format": ["json", "html", "txt"], //設定下載所包含的格式
+  "backup_folder": "./backups" //儲存備份資料的資料夾
 }
 ```
 
