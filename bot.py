@@ -19,6 +19,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 intents.members = True  # 匯出成員資訊需要這個
+intents.message_content = True  
 
 # -----------------------------------------------------
 # 建立 bot 實例
