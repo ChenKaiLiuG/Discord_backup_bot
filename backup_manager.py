@@ -2,6 +2,7 @@ import os
 import json
 import datetime
 import discord
+import requests
 
 async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
     """主備份流程，包含訊息與結構備份"""
@@ -19,6 +20,8 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
     for channel in guild.text_channels:
         await export_channel_messages(channel, backup_path)
 
+    # 匯出伺服器的 Emoji
+    await export_emojis(guild, backup_path, download_emojis=True)
     print(f"伺服器 {guild.name} 備份完成，儲存於 {backup_path}")
 
 # ---------------------------------------------------------------------
@@ -122,3 +125,41 @@ async def export_channel_messages(channel: discord.channel.TextChannel, backup_p
             for msg in messages:
                 f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}</p>\n")
             f.write("</body></html>")
+
+# ---------------------------------------------------------------------
+# Emoji匯出
+async def export_emojis(guild: discord.guild.Guild, backup_path: str, download_emojis: bool = False):
+    """匯出伺服器的 Emoji"""
+    emojis = []
+    for emoji in guild.emojis:
+        emojis.append({
+            "id": emoji.id,
+            "name": emoji.name,
+            "url": str(emoji.url)
+        })
+
+    emojis_file = os.path.join(backup_path, "emojis.json")
+    with open(emojis_file, "w", encoding="utf-8") as f:
+        json.dump(emojis, f, ensure_ascii=False, indent=2)
+    
+    # 下載 Emoji 圖片
+    if download_emojis:
+        emojis_dir = os.path.join(backup_path, "emojis")
+        os.makedirs(emojis_dir, exist_ok=True)
+        for emoji in emojis:
+            emoji_url = emoji["url"]
+            # 判斷Emoji是否為靜態或動態
+            if emoji_url.endswith(".gif"):
+                emoji_name = f"{emoji['name']}.gif"
+            else:
+                emoji_name = f"{emoji['name']}.png"
+            emoji_path = os.path.join(emojis_dir, emoji_name)
+            response = requests.get(emoji_url)
+            if response.status_code == 200:
+                with open(emoji_path, "wb") as f:
+                    f.write(response.content)
+                print(f"下載 Emoji {emoji['name']} 成功")
+            else:
+                print(f"下載 Emoji {emoji['name']} 失敗，狀態碼：{response.status_code}")
+
+
