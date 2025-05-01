@@ -52,16 +52,18 @@ schedule
 }
 ```
 
-// 或在 config.py 中直接讀取該檔案：
+<!--
+ 或在 config.py 中直接讀取該檔案：
 
-//```
-//import json
+```
+import json
 
-//with open("config.json", "r") as f:
-//    config = json.load(f)
+with open("config.json", "r") as f:
+    config = json.load(f)
 
-//BOT_TOKEN = config["BOT_TOKEN"]
-//```
+BOT_TOKEN = config["BOT_TOKEN"]
+```
+-->
 
 ### 3. 啟用 Intent（重要）
 
