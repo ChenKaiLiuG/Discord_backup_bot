@@ -43,9 +43,10 @@ async def backup(ctx):
     await ctx.send("備份完成！")
 
 # -----------------------------------------------------
-# 啟動排程（放在背景 thread 避免阻塞）
-#async def run_schedule():
-#    await asyncio.to_thread(schedule_backups, bot)
+# 啟動排程
+async def run_schedule():
+    thread = threading.Thread(target=schedule_backups, args=(bot,), daemon=True)
+    thread.start()
 
 # -----------------------------------------------------
 # 啟動 bot
