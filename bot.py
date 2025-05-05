@@ -4,7 +4,7 @@ import asyncio
 import json
 
 from backup_manager import run_backup
-# from scheduler import schedule_backups
+from scheduler import schedule_backups
 
 # -----------------------------------------------------
 # 載入 Token 與設定
@@ -31,8 +31,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"機器人已登入：{bot.user.name} (ID: {bot.user.id})")
     print(f"目前已加入 {len(bot.guilds)} 個伺服器")
-    # 啟動備份排程（非同步背景執行）
-#    asyncio.create_task(run_schedule())
+    asyncio.create_task(run_schedule())
 
 # -----------------------------------------------------
 # 指令：!backup（手動備份當前伺服器）
