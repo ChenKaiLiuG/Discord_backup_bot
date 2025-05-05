@@ -2,7 +2,7 @@
 ## 功能
 
 - `!backup`：手動備份當前伺服器
-- 定期排程備份（可修改排程時間）**（尚未實裝）**
+- 定期排程備份（可修改排程時間）**（beta）**
 - 匯出：
   - 所有文字頻道訊息
   - 頻道分類、頻道、角色
@@ -51,7 +51,7 @@ schedule
   "guild_id": "複製你的伺服器 id",
   "output_format": ["json", "html", "txt"], //設定下載所包含的格式
   "backup_folder": "./backups" //儲存備份資料的資料夾
-  "SCHEDULE": "daily"  // 可選：daily, hourly, weekly
+  "SCHEDULE": "開始自動備份的時間"  // 可選：daily, hourly, weekly
 }
 ```
 
@@ -87,16 +87,14 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 機器人會開始備份當前伺服器，並儲存到 backups/ 資料夾。
 
-### 自動排程備份（尚未實裝）
+### 自動排程備份（beta）
 
-機器人啟動後會自動依照 scheduler.py 設定的時間執行備份。  
+機器人啟動後會自動依照 config.json 設定的時間執行備份。  
 
-目前預設：每天午夜 00:00 自動執行。  
-
-你可以修改：
 ```
-# scheduler.py
-schedule.every().day.at("00:00").do(backup_job, bot)
+"hourly",每小時整點備份
+"daily@03:00",每天凌晨 3 點備份
+"weekly@monday@02:00",每週一凌晨 2 點備份
 ```
 
 備份結果說明
@@ -114,9 +112,9 @@ backups/
 （歡迎貢獻）
 
 •壓縮備份資料 .zip  
-•將備份同步到 Google Drive / OneDrive  
-•加入 Email 通知  
-•匯出 Emoji / Webhook 設定  
+•將備份同步到 Google Drive  （API巨難搞）
+•定時備份開始時加入 Discord/Email 通知  
+•匯出 Webhook 設定  
 
 
 本工具由 AI 協助，配合自架平台訊息遷移需求打造。如需協助擴充功能，歡迎提問！
