@@ -36,8 +36,8 @@ discord_backup_bot/
 ```bash
 pip install -r requirement.txt
 ```
-requirement.txt
-```
+
+```requirement.txt
 discord.py
 schedule
 ```
@@ -91,7 +91,8 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 機器人啟動後會自動依照 config.json 設定的時間執行備份。  
 
-```
+```config.json "SCHEDULE"
+false,不啟用排程
 "hourly",每小時整點備份
 "daily@03:00",每天凌晨 3 點備份
 "weekly@monday@02:00",每週一凌晨 2 點備份
@@ -112,7 +113,7 @@ backups/
 （歡迎貢獻）
 
 •壓縮備份資料 .zip  
-•將備份同步到 Google Drive  （API巨難搞）
+•將備份同步到 Google Drive （API巨難搞）  
 •定時備份開始時加入 Discord/Email 通知  
 •匯出 Webhook 設定  
 
