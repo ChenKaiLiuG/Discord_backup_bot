@@ -7,8 +7,8 @@ def export_structure(guild, backup_path):
 
     structure_file = os.path.join(backup_path, "structure.json")
     members_file = os.path.join(backup_path, "members.json")
-    
-    # 匯出伺服器的頻道結構
+
+    # 匯出伺服器的結構
     structure = {
         "guild_id": guild.id,
         "guild_name": guild.name,
@@ -17,28 +17,42 @@ def export_structure(guild, backup_path):
         "roles": [],
     }
 
-    # 頻道結構
+    # 建立 id → 名稱 的類別對照表
+    category_name_map = {category.id: category.name for category in guild.categories}
+
+    # 類別清單
     for category in guild.categories:
         structure["categories"].append({
             "id": category.id,
             "name": category.name
         })
 
-    for channel in guild.text_channels:
+    # 頻道（文字 + 語音）
+    all_channels = guild.text_channels + guild.voice_channels
+    for channel in all_channels:
+        # 權限覆寫
+        overwrites = []
+        for target, perms in channel.overwrites.items():
+            target_type = "role" if hasattr(target, "permissions") else "member"
+            overwrites.append({
+                "target_id": target.id,
+                "target_name": target.name,
+                "target_type": target_type,
+                "allow": perms.pair()[0].value,
+                "deny": perms.pair()[1].value
+            })
+
         structure["channels"].append({
             "id": channel.id,
             "name": channel.name,
-            "type": "text"
+            "type": "text" if channel in guild.text_channels else "voice",
+            "parent_id": channel.category_id,
+            "parent_name": category_name_map.get(channel.category_id),  # 新增的欄位
+            "sync_with_category": channel.permissions_synced,
+            "overwrites": overwrites
         })
 
-    for channel in guild.voice_channels:
-        structure["channels"].append({
-            "id": channel.id,
-            "name": channel.name,
-            "type": "voice"
-        })
-
-    # 角色與權限
+    # 角色清單
     for role in guild.roles:
         structure["roles"].append({
             "id": role.id,
@@ -46,17 +60,17 @@ def export_structure(guild, backup_path):
             "permissions": [str(perm) for perm in role.permissions]
         })
 
-    # 儲存伺服器結構
+    # 儲存
     with open(structure_file, "w", encoding="utf-8") as f:
         json.dump(structure, f, ensure_ascii=False, indent=2)
 
-    # 儲存所有成員的 ID、名稱、暱稱與狀態
+    # 成員清單
     members = [{
         "id": member.id,
         "name": member.name,
         "discriminator": member.discriminator,
-        "nickname": member.nick if member.nick else None,  # 儲存暱稱
-        "status": str(member.status)  # 儲存狀態（如：online, offline, dnd）
+        "nickname": member.nick if member.nick else None,
+        "status": str(member.status)
     } for member in guild.members]
 
     with open(members_file, "w", encoding="utf-8") as f:
