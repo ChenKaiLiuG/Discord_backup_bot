@@ -51,6 +51,7 @@ schedule
   "guild_id": "複製你的伺服器 id",
   "output_format": ["json", "html", "txt"], //設定下載所包含的格式
   "backup_folder": "./backups" //儲存備份資料的資料夾
+  "SCHEDULE": "daily"  // 可選：daily, hourly, weekly
 }
 ```
 
