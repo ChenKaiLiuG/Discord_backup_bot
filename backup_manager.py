@@ -162,4 +162,10 @@ async def export_emojis(guild: discord.guild.Guild, backup_path: str, download_e
             else:
                 print(f"下載 Emoji {emoji['name']} 失敗，狀態碼：{response.status_code}")
 
-
+# ---------------------------------------------------------------------
+# 統一備份所有流程（供排程與指令使用）
+async def run_backup_all(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
+    try:
+        await run_backup(bot, guild)
+    except Exception as e:
+        print(f"備份伺服器 {guild.name} 時發生錯誤：{e}")
