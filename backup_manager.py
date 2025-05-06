@@ -2,7 +2,7 @@ import os
 import json
 import datetime
 import discord
-from structure_exporter import export_structure
+from utils.structure_exporter import export_structure
 from message_exporter import export_channel_messages
 from emoji_exporter import export_emojis
 
