@@ -3,8 +3,9 @@ import json
 import datetime
 import discord
 from utils.structure_exporter import export_structure
-from message_exporter import export_channel_messages
+from utils.message_exporter import export_channel_messages, export_thread_messages
 from emoji_exporter import export_emojis
+from utils.attachment_downloader import download_attachments
 
 async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
     """主備份流程，包含訊息與結構備份"""
@@ -16,8 +17,11 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
 
     export_structure(guild, backup_path)
 
-    for channel in guild.text_channels:
-        await export_channel_messages(channel, backup_path)
+        for channel in guild.text_channels:
+            await export_channel_messages(channel, backup_path)
+        for thread in channel.threads:
+            await export_thread_messages(thread, backup_path)
+
 
     await export_emojis(guild, backup_path, download_emojis=True)
 
