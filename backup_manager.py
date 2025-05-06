@@ -4,7 +4,7 @@ import datetime
 import discord
 from utils.structure_exporter import export_structure
 from utils.message_exporter import export_channel_messages, export_thread_messages
-from emoji_exporter import export_emojis
+from utils.emoji_exporter import export_emojis
 from utils.attachment_downloader import download_attachments
 
 async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
