@@ -4,6 +4,8 @@ import datetime
 import discord
 import requests
 
+from utils.attachment_downloader import download_attachments
+
 async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Guild):
     """主備份流程，包含訊息與結構備份"""
 
@@ -81,8 +83,11 @@ async def export_structure(guild: discord.guild.Guild, backup_path: str):
 
 async def export_channel_messages(channel: discord.channel.TextChannel, backup_path: str):
     with open("config.json", "r", encoding="utf-8") as f:
-        output_format = set(json.load(f)["output_format"])
-    """將頻道訊息匯出為 json/html/txt 檔案"""
+        config = json.load(f)
+
+    output_format = set(config.get("output_format", []))
+    download_attachments_enabled = config.get("download_attachments", False)
+
     print(f"正在備份頻道：{channel.name}")
     messages = []
 
@@ -118,15 +123,29 @@ async def export_channel_messages(channel: discord.channel.TextChannel, backup_p
             for msg in messages:
                 f.write(f"[{msg['timestamp']}] {msg['author']}: {msg['content']}\n")
 
-    # 儲存為簡易 HTML
+    # 儲存為 HTML（含附件圖片顯示）
     if "html" in output_format:
         html_path = os.path.join(channel_dir, f"{channel.name}.html")
+        attachments_subdir = f"{channel.name}_attachments"
         with open(html_path, "w", encoding="utf-8") as f:
             f.write("<html><body>\n")
             f.write(f"<h1>Channel: {channel.name}</h1>\n")
             for msg in messages:
-                f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}</p>\n")
+                f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}<br>\n")
+                for url in msg["attachments"]:
+                    filename = os.path.basename(url)
+                    if any(filename.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
+                        f.write(f'<img src="{attachments_subdir}/{filename}" width="300"><br>\n')
+                    else:
+                        f.write(f'<a href="{attachments_subdir}/{filename}">{filename}</a><br>\n')
+                f.write("</p>\n")
             f.write("</body></html>")
+
+    # 下載附件
+    if download_attachments_enabled:
+        attachments_path = os.path.join(channel_dir, f"{channel.name}_attachments")
+        os.makedirs(attachments_path, exist_ok=True)
+        await download_attachments(messages, attachments_path)
 
 # ---------------------------------------------------------------------
 # Emoji匯出
