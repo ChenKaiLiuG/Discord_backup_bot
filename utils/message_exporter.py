@@ -1,66 +1,111 @@
 import os
+import json
+import datetime
 import discord
-import aiohttp
-from utils.formatter import format_message_as_html, format_message_as_txt
+from utils.attachment_downloader import download_attachments
 
-async def download_attachment(attachment, download_folder):
-    """下載附件到指定資料夾"""
-    file_path = os.path.join(download_folder, attachment.filename)
-    async with aiohttp.ClientSession() as session:
-        async with session.get(attachment.url) as response:
-            if response.status == 200:
-                with open(file_path, "wb") as f:
-                    f.write(await response.read())
-                print(f"已下載附件：{attachment.filename}")
-            else:
-                print(f"下載附件失敗：{attachment.filename}")
-    return file_path
+async def export_channel_messages(channel: discord.TextChannel, backup_path: str):
+    """將頻道訊息匯出為 json/html/txt 檔案"""
+    with open("config.json", "r", encoding="utf-8") as f:
+        config = json.load(f)
 
-async def export_all_messages(bot, guild, backup_path, formats=["json"]):
-    print(f"正在備份伺服器訊息：{guild.name}")
+    output_format = set(config.get("output_format", []))
+    download_attachments_enabled = config.get("download_attachments", False)
 
-    message_dir = os.path.join(backup_path, "messages")
-    os.makedirs(message_dir, exist_ok=True)
+    print(f"正在備份頻道：{channel.name}")
+    messages = await collect_messages(channel)
 
-    for channel in guild.text_channels:
-        if not channel.permissions_for(guild.me).read_message_history:
-            print(f"跳過無權限頻道：{channel.name}")
-            continue
+    channel_dir = os.path.join(backup_path, "channels")
+    os.makedirs(channel_dir, exist_ok=True)
 
-        try:
-            print(f"備份頻道：#{channel.name}")
-            messages = []
-            channel_folder = os.path.join(message_dir, channel.name)
-            os.makedirs(channel_folder, exist_ok=True)
+    await save_messages(channel.name, messages, channel_dir, output_format, download_attachments_enabled)
 
-            async for msg in channel.history(limit=None, oldest_first=True):
-                attachments = []
-                for attachment in msg.attachments:
-                    file_path = await download_attachment(attachment, channel_folder)
-                    attachments.append(file_path)
+async def export_thread_messages(thread: discord.Thread, backup_path: str):
+    """將討論串訊息匯出為 json 檔案"""
+    print(f"正在備份討論串：{thread.name}")
+    messages = await collect_messages(thread)
 
-                messages.append({
-                    "id": msg.id,
-                    "author": f"{msg.author.name}#{msg.author.discriminator}",
-                    "content": msg.content,
-                    "timestamp": msg.created_at.isoformat(),
-                    "attachments": attachments
-                })
+    thread_dir = os.path.join(backup_path, "threads")
+    os.makedirs(thread_dir, exist_ok=True)
 
-            base_filename = os.path.join(channel_folder, f"{channel.name}")
-            if "json" in formats:
-                with open(base_filename + ".json", "w", encoding="utf-8") as f:
-                    json.dump(messages, f, ensure_ascii=False, indent=2)
+    json_path = os.path.join(thread_dir, f"{thread.name}.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(messages, f, ensure_ascii=False, indent=2)
 
-            if "html" in formats:
-                html = format_message_as_html(channel.name, messages)
-                with open(base_filename + ".html", "w", encoding="utf-8") as f:
-                    f.write(html)
+# ------------------------------------------------------
 
-            if "txt" in formats:
-                txt = format_message_as_txt(messages)
-                with open(base_filename + ".txt", "w", encoding="utf-8") as f:
-                    f.write(txt)
+async def collect_messages(channel_or_thread):
+    """收集訊息"""
+    messages = []
+    try:
+        async for message in channel_or_thread.history(limit=None, oldest_first=True):
+            messages.append({
+                "id": message.id,
+                "author": f"{message.author.name}#{message.author.discriminator}",
+                "content": message.content,
+                "timestamp": str(message.created_at),
+                "attachments": [a.url for a in message.attachments],
+                "embeds": [e.to_dict() for e in message.embeds],
+                "pinned": message.pinned
+            })
+    except Exception as e:
+        print(f"無法備份 {channel_or_thread.name}：{e}")
+    return messages
 
-        except Exception as e:
-            print(f"備份頻道失敗：{channel.name}，錯誤：{e}")
+async def save_messages(name, messages, directory, output_format, download_attachments_enabled):
+    """儲存訊息為 json/txt/html，並下載附件"""
+    if "json" in output_format:
+        json_path = os.path.join(directory, f"{name}.json")
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(messages, f, ensure_ascii=False, indent=2)
+
+    if "txt" in output_format:
+        txt_path = os.path.join(directory, f"{name}.txt")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            for msg in messages:
+                f.write(f"[{msg['timestamp']}] {msg['author']}: {msg['content']}\n")
+
+    if "html" in output_format:
+        html_path = os.path.join(directory, f"{name}.html")
+        attachments_subdir = f"{name}_attachments"
+        with open(html_path, "w", encoding="utf-8") as f:
+            f.write(generate_html_header(name))
+            for msg in messages:
+                f.write('<div class="message">')
+                f.write(f'<span class="author">{msg["author"]}</span>')
+                f.write(f'<span class="timestamp">[{msg["timestamp"]}]</span><br>')
+                f.write(f'<div class="content">{msg["content"]}</div>')
+                for url in msg["attachments"]:
+                    filename = os.path.basename(url)
+                    file_path = f"{attachments_subdir}/{filename}"
+                    if any(filename.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
+                        f.write(f'<img src="{file_path}" alt="{filename}">')
+                    else:
+                        f.write(f'<a class="attachment" href="{file_path}">{filename}</a>')
+                f.write('</div>\n')
+            f.write("</body></html>")
+
+    if download_attachments_enabled:
+        attachments_path = os.path.join(directory, f"{name}_attachments")
+        os.makedirs(attachments_path, exist_ok=True)
+        await download_attachments(messages, attachments_path)
+
+def generate_html_header(channel_name):
+    return f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Channel: {channel_name}</title>
+    <style>
+        body {{ font-family: sans-serif; background: #2c2f33; color: #dcddde; padding: 20px; }}
+        .message {{ margin-bottom: 20px; padding: 10px; background: #36393f; border-radius: 5px; }}
+        .author {{ font-weight: bold; color: #7289da; }}
+        .timestamp {{ color: #72767d; font-size: 0.9em; margin-left: 5px; }}
+        img {{ max-width: 400px; border-radius: 4px; display: block; margin-top: 5px; }}
+        a.attachment {{ display: block; color: #00b0f4; margin-top: 5px; }}
+    </style>
+</head>
+<body>
+<h1>Channel: {channel_name}</h1>
+"""
