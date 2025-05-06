@@ -51,7 +51,8 @@ schedule
   "guild_id": "複製你的伺服器 id",
   "output_format": ["json", "html", "txt"], //設定下載所包含的格式
   "backup_folder": "./backups" //儲存備份資料的資料夾
-  "SCHEDULE": "開始自動備份的時間"  // 可選：daily, hourly, weekly
+  "SCHEDULE": "開始自動備份的時間"  // 可選：daily, hourly, weekly；false時關閉
+  "download_attachments": 是否下載附件 // true時開啟
 }
 ```
 
