@@ -19,6 +19,8 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
     # 備份每個頻道的訊息
     for channel in guild.text_channels:
         await export_channel_messages(channel, backup_path)
+    for thread in guild.threads:
+        await export_thread_messages(thread, backup_path)
 
     # 匯出伺服器的 Emoji
     await export_emojis(guild, backup_path, download_emojis=True)
@@ -169,3 +171,32 @@ async def run_backup_all(bot: discord.ext.commands.bot.Bot, guild: discord.guild
         await run_backup(bot, guild)
     except Exception as e:
         print(f"備份伺服器 {guild.name} 時發生錯誤：{e}")
+
+async def export_thread_messages(thread: discord.Thread , backup_path: str):
+    """將討論串訊息匯出為 json 檔案"""
+    print(f"正在備份討論串：{thread.name}")
+    messages = []
+
+    try:
+        async for message in thread.history(limit=None, oldest_first=True):
+            messages.append({
+                "id": message.id,
+                "author": f"{message.author.name}#{message.author.discriminator}",
+                "content": message.content,
+                "timestamp": str(message.created_at),
+                "attachments": [a.url for a in message.attachments],
+                "embeds": [e.to_dict() for e in message.embeds],
+                "pinned": message.pinned
+            })
+
+    except Exception as e:
+        print(f"無法備份討論串 {thread.name}：{e}")
+        return
+
+    thread_dir = os.path.join(backup_path, "threads")
+    os.makedirs(thread_dir, exist_ok=True)
+
+    # 儲存為 JSON
+    json_path = os.path.join(thread_dir, f"{thread.name}.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(messages, f, ensure_ascii=False, indent=2)
