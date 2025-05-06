@@ -82,6 +82,7 @@ async def export_structure(guild: discord.guild.Guild, backup_path: str):
 # 訊息匯出
 
 async def export_channel_messages(channel: discord.channel.TextChannel, backup_path: str):
+    """將頻道訊息匯出為 json/html/txt 檔案"""
     with open("config.json", "r", encoding="utf-8") as f:
         config = json.load(f)
 
