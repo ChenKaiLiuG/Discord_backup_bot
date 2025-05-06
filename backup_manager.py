@@ -126,21 +126,47 @@ async def export_channel_messages(channel: discord.channel.TextChannel, backup_p
 
     # 儲存為 HTML（含附件圖片顯示）
     if "html" in output_format:
-        html_path = os.path.join(channel_dir, f"{channel.name}.html")
-        attachments_subdir = f"{channel.name}_attachments"
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write("<html><body>\n")
-            f.write(f"<h1>Channel: {channel.name}</h1>\n")
-            for msg in messages:
-                f.write(f"<p><b>{msg['author']}</b> [{msg['timestamp']}]: {msg['content']}<br>\n")
-                for url in msg["attachments"]:
-                    filename = os.path.basename(url)
-                    if any(filename.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
-                        f.write(f'<img src="{attachments_subdir}/{filename}" width="300"><br>\n')
-                    else:
-                        f.write(f'<a href="{attachments_subdir}/{filename}">{filename}</a><br>\n')
-                f.write("</p>\n")
-            f.write("</body></html>")
+    html_path = os.path.join(channel_dir, f"{channel.name}.html")
+    attachments_subdir = f"{channel.name}_attachments"
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write("""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Channel: {0}</title>
+            <style>
+                    body {{ font-family: sans-serif; background: #2c2f33; color: #dcddde; padding: 20px; }}
+                    .message {{ margin-bottom: 20px; padding: 10px; background: #36393f; border-radius: 5px; }}
+                    .author {{ font-weight: bold; color: #7289da; }}
+                    .timestamp {{ color: #72767d; font-size: 0.9em; margin-left: 5px; }}
+                    img {{ max-width: 400px; border-radius: 4px; display: block; margin-top: 5px; }}
+                    a.attachment {{ display: block; color: #00b0f4; margin-top: 5px; }}
+            </style>
+            </head>
+            <body>
+            <h1>Channel: {0}</h1>
+            """.format(channel.name))
+
+        for msg in messages:
+            f.write('<div class="message">')
+            f.write(f'<span class="author">{msg["author"]}</span>')
+            f.write(f'<span class="timestamp">[{msg["timestamp"]}]</span><br>')
+            f.write(f'<div class="content">{msg["content"]}</div>')
+
+            # 顯示附件（圖片或連結）
+            for url in msg["attachments"]:
+                filename = os.path.basename(url)
+                file_path = f"{attachments_subdir}/{filename}"
+                if any(filename.lower().endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
+                    f.write(f'<img src="{file_path}" alt="{filename}">')
+                else:
+                    f.write(f'<a class="attachment" href="{file_path}">{filename}</a>')
+
+            f.write('</div>\n')
+
+        f.write("</body></html>")
+
 
     # 下載附件
     if download_attachments_enabled:
