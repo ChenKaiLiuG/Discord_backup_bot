@@ -15,13 +15,13 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
     backup_path = os.path.join(backup_folder, f"{guild.name}_{timestamp}")
     os.makedirs(backup_path, exist_ok=True)
 
-    export_structure(guild, backup_path)
+    await export_structure(guild, backup_path)
 
-        for channel in guild.text_channels:
-            await export_channel_messages(channel, backup_path)
-        for thread in channel.threads:
-            await export_thread_messages(thread, backup_path)
+    for channel in guild.text_channels:
+        await export_channel_messages(channel, backup_path)
 
+    for thread in guild.threads:
+        await export_thread_messages(thread, backup_path)
 
     await export_emojis(guild, backup_path, download_emojis=True)
 
