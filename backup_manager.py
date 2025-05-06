@@ -130,23 +130,23 @@ async def export_channel_messages(channel: discord.channel.TextChannel, backup_p
     attachments_subdir = f"{channel.name}_attachments"
     with open(html_path, "w", encoding="utf-8") as f:
         f.write("""
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <title>Channel: {0}</title>
-            <style>
-                    body {{ font-family: sans-serif; background: #2c2f33; color: #dcddde; padding: 20px; }}
-                    .message {{ margin-bottom: 20px; padding: 10px; background: #36393f; border-radius: 5px; }}
-                    .author {{ font-weight: bold; color: #7289da; }}
-                    .timestamp {{ color: #72767d; font-size: 0.9em; margin-left: 5px; }}
-                    img {{ max-width: 400px; border-radius: 4px; display: block; margin-top: 5px; }}
-                    a.attachment {{ display: block; color: #00b0f4; margin-top: 5px; }}
-            </style>
-            </head>
-            <body>
-            <h1>Channel: {0}</h1>
-            """.format(channel.name))
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Channel: {0}</title>
+    <style>
+        body {{ font-family: sans-serif; background: #2c2f33; color: #dcddde; padding: 20px; }}
+        .message {{ margin-bottom: 20px; padding: 10px; background: #36393f; border-radius: 5px; }}
+        .author {{ font-weight: bold; color: #7289da; }}
+        .timestamp {{ color: #72767d; font-size: 0.9em; margin-left: 5px; }}
+        img {{ max-width: 400px; border-radius: 4px; display: block; margin-top: 5px; }}
+        a.attachment {{ display: block; color: #00b0f4; margin-top: 5px; }}
+    </style>
+</head>
+<body>
+<h1>Channel: {0}</h1>
+""".format(channel.name))
 
         for msg in messages:
             f.write('<div class="message">')
