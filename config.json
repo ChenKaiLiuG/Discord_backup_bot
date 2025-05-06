@@ -4,4 +4,5 @@
    "output_format": ["json", "html", "txt"],
    "backup_folder": "./backups"
    "SCHEDULE": false
+   "download_attachments": false
  }
