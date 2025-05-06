@@ -1,10 +1,13 @@
 # Discord_backup_bot
+
+> 自動或手動備份你的 Discord 伺服器資料，支援多種格式輸出與定期排程。適用於遷移、歸檔或數據分析需求。  
+
 ## 功能
 
 - `!backup`：手動備份當前伺服器
 - 定期排程備份（可修改排程時間）**（beta）**
 - 匯出：
-  - 所有文字頻道訊息
+  - 所有文字頻道訊息（含圖片）  
   - 頻道分類、頻道、角色
   - 所有伺服器成員 ID、暱稱、狀態
 - 支援儲存格式：
@@ -18,14 +21,15 @@ discord_backup_bot/
 ├── bot.py # 主程式，啟動 Bot 並處理指令  
 ├── config.json # 儲存 Token、伺服器 ID、輸出格式等  
 ├── backup_manager.py # 控管備份流程的模組  
-├── utils/  
+├── utils/ # 功能模組化工具  
 │   ├── message_exporter.py # 匯出訊息（JSON/HTML/TXT）  
 │   ├── attachment_downloader.py # 下載附件  
-│   ├── structure_exporter.py # 匯出頻道、角色、分類等設定  
+│   ├── structure_exporter.py # 匯出頻道、角色、分類等設定
+│   ├── scheduler.py # 可獨立執行的排程備份腳本  
 │   └── formatter.py # 控管輸出格式  
 ├── backups/ # 備份資料儲存資料夾  
 │   └── ...  
-└── scheduler.py # 可獨立執行的排程備份腳本  
+└── requirements.txt # 套件清單  
 ```
 ## 安裝與執行
 
@@ -42,9 +46,9 @@ discord.py
 schedule
 ```
 
-### 2. 設定 BOT Token
+### 2. 設定 config
 
-修改 config.json 並填入你的 Discord bot token 和伺服器 id：
+修改 config.json 並填入你的資訊：
 ```config.json
 {
   "bot_token": "你的 token 放這裡",
@@ -55,19 +59,6 @@ schedule
   "download_attachments": 是否下載附件 // true時開啟
 }
 ```
-
-<!--
- 或在 config.py 中直接讀取該檔案：
-
-```
-import json
-
-with open("config.json", "r") as f:
-    config = json.load(f)
-
-BOT_TOKEN = config["BOT_TOKEN"]
-```
--->
 
 ### 3. 啟用 Intent（重要）
 
@@ -92,11 +83,11 @@ BOT_TOKEN = config["BOT_TOKEN"]
 
 機器人啟動後會自動依照 config.json 設定的時間執行備份。  
 
-```config.json "SCHEDULE"
-false,不啟用排程
-"hourly",每小時整點備份
-"daily@03:00",每天凌晨 3 點備份
-"weekly@monday@02:00",每週一凌晨 2 點備份
+```config.json  
+"SCHEDULE": false                   // 關閉排程
+"SCHEDULE": "hourly"               // 每小時整點
+"SCHEDULE": "daily@03:00"          // 每日凌晨 3 點
+"SCHEDULE": "weekly@monday@02:00"  // 每週一凌晨 2 點
 ```
 
 備份結果說明
@@ -117,6 +108,3 @@ backups/
 •將備份同步到 Google Drive （API巨難搞）  
 •定時備份開始時加入 Discord/Email 通知  
 •匯出 Webhook 設定  
-
-
-本工具由 AI 協助，配合自架平台訊息遷移需求打造。如需協助擴充功能，歡迎提問！
