@@ -76,4 +76,42 @@ def export_structure(guild, backup_path):
     with open(members_file, "w", encoding="utf-8") as f:
         json.dump(members, f, ensure_ascii=False, indent=2)
 
+    # 輸出 HTML 頻道結構圖
+    html_file = os.path.join(backup_path, "structure.html")
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write("<html><head><meta charset='utf-8'><style>\n")
+        f.write("body { font-family: Arial, sans-serif; }\n")
+        f.write(".category { font-weight: bold; margin-top: 1em; }\n")
+        f.write(".channel { margin-left: 20px; }\n")
+        f.write(".voice { color: gray; font-style: italic; }\n")
+        f.write("</style></head><body>\n")
+        f.write(f"<h1>伺服器結構：{guild.name}</h1>\n")
+
+        # 類別 → 頻道對照
+        categories = {c.id: [] for c in guild.categories}
+        uncategorized = []
+
+        for ch in structure["channels"]:
+            if ch["parent_id"] in categories:
+                categories[ch["parent_id"]].append(ch)
+            else:
+                uncategorized.append(ch)
+
+        # 有類別的
+        for cat in structure["categories"]:
+            f.write(f"<div class='category'>{cat['name']}</div>\n")
+            for ch in categories.get(cat["id"], []):
+                channel_type = "voice" if ch["type"] == "voice" else "text"
+                voice_class = " voice" if channel_type == "voice" else ""
+                f.write(f"<div class='channel{voice_class}'>#{ch['name']}</div>\n")
+
+        # 無分類的頻道
+        if uncategorized:
+            f.write(f"<div class='category'>未分類</div>\n")
+            for ch in uncategorized:
+                voice_class = " voice" if ch["type"] == "voice" else ""
+                f.write(f"<div class='channel{voice_class}'>#{ch['name']}</div>\n")
+
+        f.write("</body></html>")
+
     print(f"伺服器結構與成員已儲存：{structure_file}, {members_file}")
