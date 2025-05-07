@@ -2,7 +2,7 @@
    "bot_token": "YOUR_DISCORD_BOT_TOKEN",
    "guild_id": "123456789012345678",
    "output_format": ["json", "html", "txt"],
-   "backup_folder": "./backups"
-   "SCHEDULE": false
+   "backup_folder": "./backups",
+   "SCHEDULE": false,
    "download_attachments": false
  }
