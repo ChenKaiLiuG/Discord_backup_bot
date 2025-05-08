@@ -2,9 +2,10 @@ import discord
 from discord.ext import commands
 import asyncio
 import json
+import threading
 
 from backup_manager import run_backup
-from scheduler import schedule_backups
+from utils.scheduler import schedule_backups
 
 # -----------------------------------------------------
 # 載入 Token 與設定
