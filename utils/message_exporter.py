@@ -1,17 +1,11 @@
 import os
 import json
-import datetime
+import html
 import discord
 from utils.attachment_downloader import download_attachments
 
-async def export_channel_messages(channel: discord.TextChannel, backup_path: str):
+async def export_channel_messages(channel: discord.TextChannel, backup_path: str, output_format: set[str] , download_attachments_enabled: bool = False):
     """將頻道訊息匯出為 json/html/txt 檔案"""
-    with open("config.json", "r", encoding="utf-8") as f:
-        config = json.load(f)
-
-    output_format = set(config.get("output_format", []))
-    download_attachments_enabled = config.get("download_attachments", False)
-
     print(f"正在備份頻道：{channel.name}")
     messages = await collect_messages(channel)
 
@@ -20,17 +14,15 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
 
     await save_messages(channel.name, messages, channel_dir, output_format, download_attachments_enabled)
 
-async def export_thread_messages(thread: discord.Thread, backup_path: str):
-    """將討論串訊息匯出為 json 檔案"""
+async def export_thread_messages(thread: discord.Thread, backup_path: str, output_format: set[str] , download_attachments_enabled: bool = False):
+    """將討論串訊息匯出為 json/html/txt 檔案"""
     print(f"正在備份討論串：{thread.name}")
     messages = await collect_messages(thread)
 
     thread_dir = os.path.join(backup_path, "threads")
     os.makedirs(thread_dir, exist_ok=True)
 
-    json_path = os.path.join(thread_dir, f"{thread.name}.json")
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
+    await save_messages(thread.name, messages, thread_dir , output_format, download_attachments_enabled)
 
 # ------------------------------------------------------
 
@@ -72,9 +64,9 @@ async def save_messages(name, messages, directory, output_format, download_attac
             f.write(generate_html_header(name))
             for msg in messages:
                 f.write('<div class="message">')
-                f.write(f'<span class="author">{msg["author"]}</span>')
+                f.write(f'<span class="author">{html.escape(msg["author"])}</span>')
                 f.write(f'<span class="timestamp">[{msg["timestamp"]}]</span><br>')
-                f.write(f'<div class="content">{msg["content"]}</div>')
+                f.write(f'<div class="content">{html.escape(msg["content"])}</div>')
                 for url in msg["attachments"]:
                     filename = os.path.basename(url)
                     file_path = f"{attachments_subdir}/{filename}"
