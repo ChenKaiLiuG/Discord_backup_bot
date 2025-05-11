@@ -22,15 +22,18 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
 
 async def export_thread_messages(thread: discord.Thread, backup_path: str):
     """將討論串訊息匯出為 json 檔案"""
+    with open("config.json", "r", encoding="utf-8") as f:
+        config = json.load(f)
+    output_format = set(config.get("output_format", []))
+    download_attachments_enabled = config.get("download_attachments", False)
+
     print(f"正在備份討論串：{thread.name}")
     messages = await collect_messages(thread)
 
     thread_dir = os.path.join(backup_path, "threads")
     os.makedirs(thread_dir, exist_ok=True)
 
-    json_path = os.path.join(thread_dir, f"{thread.name}.json")
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
+    await save_messages(thread.name, messages, thread_dir , output_format, download_attachments_enabled)
 
 # ------------------------------------------------------
 
