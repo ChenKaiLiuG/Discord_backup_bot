@@ -1,6 +1,6 @@
 import os
 import json
-import datetime
+import html
 import discord
 from utils.attachment_downloader import download_attachments
 
@@ -75,9 +75,9 @@ async def save_messages(name, messages, directory, output_format, download_attac
             f.write(generate_html_header(name))
             for msg in messages:
                 f.write('<div class="message">')
-                f.write(f'<span class="author">{msg["author"]}</span>')
+                f.write(f'<span class="author">{html.escape(msg["author"])}</span>')
                 f.write(f'<span class="timestamp">[{msg["timestamp"]}]</span><br>')
-                f.write(f'<div class="content">{msg["content"]}</div>')
+                f.write(f'<div class="content">{html.escape(msg["content"])}</div>')
                 for url in msg["attachments"]:
                     filename = os.path.basename(url)
                     file_path = f"{attachments_subdir}/{filename}"
