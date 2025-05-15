@@ -30,6 +30,18 @@ async def collect_messages(channel_or_thread):
     """收集訊息"""
     messages = []
     try:
+        async def get_reactions(reactions):
+            result = []
+            for reaction in reactions:
+                users = []
+                async for user in reaction.users():
+                    users.append({ "id": user.id, "name": user.name })
+                result.append({
+                    "emoji": getattr(reaction.emoji, "name", reaction.emoji),
+                    "sender": users
+                })
+            return result
+
         async for message in channel_or_thread.history(limit=None, oldest_first=True):
             messages.append({
                 "id": message.id,
@@ -38,7 +50,8 @@ async def collect_messages(channel_or_thread):
                 "timestamp": str(message.created_at),
                 "attachments": [a.url for a in message.attachments],
                 "embeds": [e.to_dict() for e in message.embeds],
-                "pinned": message.pinned
+                "pinned": message.pinned,
+                "reactions": await get_reactions(message.reactions),
             })
     except Exception as e:
         print(f"無法備份 {channel_or_thread.name}：{e}")
