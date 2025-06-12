@@ -15,13 +15,11 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
     
     try:
         # 備份封存的公開討論串
-        archived_threads = await channel.archived_threads(limit=None)
-        for thread in archived_threads:
+        async for thread in channel.archived_threads(limit=None):
             await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
 
         # 備份封存的私密討論串
-        private_threads = await channel.archived_threads(private=True, limit=None)
-        for thread in private_threads:
+        async for thread in channel.archived_threads(private=True, limit=None):
             await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
 
         # 活躍討論串
