@@ -11,15 +11,15 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
 
     channel_dir = os.path.join(backup_path, "channels")
     os.makedirs(channel_dir, exist_ok=True)
-
     await save_messages(channel.name, messages, channel_dir, output_format, download_attachments_enabled)
     
     try:
-        async for thread in channel.archived_threads(limit=None, joined=False, private=False):
+        # 封存討論串（包括公開/私人）
+        async for thread in channel.archived_threads(limit=None, joined=False, private=None):
             await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
+        # 活躍討論串
         async for thread in channel.threads:
-            if not thread.archived:
-                await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
+            await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
     except Exception as e:
         print(f"備份討論串時發生錯誤：{e}")
 
