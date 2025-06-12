@@ -13,6 +13,15 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
     os.makedirs(channel_dir, exist_ok=True)
 
     await save_messages(channel.name, messages, channel_dir, output_format, download_attachments_enabled)
+    
+    try:
+        async for thread in channel.archived_threads(limit=None, joined=False, private=False):
+            await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
+        async for thread in channel.threads:
+            if not thread.archived:
+                await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
+    except Exception as e:
+        print(f"備份討論串時發生錯誤：{e}")
 
 async def export_thread_messages(thread: discord.Thread, backup_path: str, output_format: set[str] , download_attachments_enabled: bool = False):
     """將討論串訊息匯出為 json/html/txt 檔案"""
