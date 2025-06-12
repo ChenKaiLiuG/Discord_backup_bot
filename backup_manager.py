@@ -11,11 +11,11 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
     """主備份流程，包含訊息與結構備份"""
     with open("config.json", "r", encoding="utf-8") as f:
         config = json.load(f)
+        
     output_format = set(config.get("output_format",[]))
     download_attachments_enabled = config.get("download_attachments",False)
+    backup_folder = config.get("backup_folder", "backup")
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    with open("config.json", "r", encoding="utf-8") as f:
-        backup_folder = json.load(f)["backup_folder"]
     backup_path = os.path.join(backup_folder, f"{guild.name}_{timestamp}")
     os.makedirs(backup_path, exist_ok=True)
 
@@ -23,9 +23,6 @@ async def run_backup(bot: discord.ext.commands.bot.Bot, guild: discord.guild.Gui
 
     for channel in guild.text_channels:
         await export_channel_messages(channel, backup_path, output_format, download_attachments_enabled)
-
-    for thread in guild.threads:
-        await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
 
     await export_emojis(guild, backup_path, download_emojis=True)
 
