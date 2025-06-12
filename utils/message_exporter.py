@@ -18,7 +18,7 @@ async def export_channel_messages(channel: discord.TextChannel, backup_path: str
         async for thread in channel.archived_threads(limit=None, joined=False, private=None):
             await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
         # 活躍討論串
-        async for thread in channel.threads:
+        for thread in channel.threads:
             await export_thread_messages(thread, backup_path, output_format, download_attachments_enabled)
     except Exception as e:
         print(f"備份討論串時發生錯誤：{e}")
