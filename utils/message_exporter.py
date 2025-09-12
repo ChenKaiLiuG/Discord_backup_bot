@@ -59,12 +59,18 @@ async def collect_messages(channel_or_thread):
         async for message in channel_or_thread.history(limit=None, oldest_first=True):
             messages.append({
                 "id": message.id,
-                "author": f"{message.author.name}#{message.author.discriminator}",
+                "author": f"{message.author.name}#{message.author.discriminator}" if message.author else "Unknown",
                 "content": message.content,
+                "system_content": message.system_content,  # ➕系統通知
                 "timestamp": str(message.created_at),
                 "attachments": [a.url for a in message.attachments],
                 "embeds": [e.to_dict() for e in message.embeds],
+                "components": [c.to_dict() for c in message.components] if hasattr(message, "components") else [],
                 "pinned": message.pinned,
+                "type": str(message.type),  # ➕訊息類型
+                "is_webhook": bool(message.webhook_id),  # ➕是否為 Webhook
+                "reply_to": message.reference.message_id if message.reference else None,
+                "stickers": [s.name for s in message.stickers] if message.stickers else [],
                 "reactions": await get_reactions(message.reactions),
             })
     except Exception as e:
