@@ -65,7 +65,14 @@ schedule
 到 Discord Developer Portal > 機器人設定 > Privileged Gateway Intents 中：
 
 • ✅ 開啟 Server Members Intent  
-• ✅ 開啟 Message Content Intent  
+• ✅ 開啟 Message Content Intent 
+
+### 4. 機器人上線
+
+透過terminal執行bot.py
+```bash
+python3 bot.py
+```
 
 ## 使用方式
 
